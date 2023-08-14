@@ -52,10 +52,11 @@ def ParseSignal(signal: str) -> dict:
     signal = signal.splitlines()
     signal = [line.rstrip() for line in signal]
 
+
     trade = {}
     
     # extracts symbol from trade signal
-    trade['Symbol'] = (signal[0][1:]).upper()
+    trade['Symbol'] = 'XAUUSD'
     
     # checks if the symbol is valid, if not, returns an empty dictionary
     if(trade['Symbol'] not in SYMBOLS):
@@ -74,10 +75,10 @@ def ParseSignal(signal: str) -> dict:
     elif('Sell Stop'.lower() in signal[0].lower()):
          trade['OrderType'] = 'Sell Stop'
 
-    elif('Buy'.lower() in signal[1].lower()):
+    elif('Buy'.lower() in (signal[0].split())[1].lower()):
         trade['OrderType'] = 'Buy'
     
-    elif('Sell'.lower() in signal[1].lower()):
+    elif('Sell'.lower() in (signal[0].split())[1].lower()):
         trade['OrderType'] = 'Sell'
     
     # returns an empty dictionary if an invalid order type was given
@@ -90,19 +91,26 @@ def ParseSignal(signal: str) -> dict:
     
     else:
         trade['Entry'] = 'NOW'
-    
-    
+
+    trade['StopLoss'] = float((signal[2].split())[-1])
     trade['TP'] = [float((signal[3].split())[-1])]
 
     # checks if there's a fourth line and parses it for TP2
     if(len(signal) > 4):
         trade['TP'].append(float(signal[4].split()[-1]))
+    
+    
+    # trade['TP'] = [float((signal[3].split())[-1])]
 
-    # checks if there's a fourth line and parses it for TP3
-    if(len(signal) > 5):
-        trade['TP'].append(float(signal[5].split()[-1]))
+    # # checks if there's a fourth line and parses it for TP2
+    # if(len(signal) > 4):
+    #     trade['TP'].append(float(signal[4].split()[-1]))
 
-    trade['StopLoss'] = float((signal[6].split())[-1])
+    # # checks if there's a fourth line and parses it for TP3
+    # if(len(signal) > 5):
+    #     trade['TP'].append(float(signal[5].split()[-1]))
+
+    # trade['StopLoss'] = float((signal[6].split())[-1])
     
     # adds risk factor to trade
     trade['RiskFactor'] = RISK_FACTOR
