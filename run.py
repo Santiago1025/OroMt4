@@ -319,6 +319,7 @@ async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
     return
 
 async def CloseAllPositions(update: Update):
+    update.effective_message.reply_text("All open positions have been closed.")
     api = MetaApi(API_KEY)
     
     try:
@@ -352,7 +353,7 @@ async def CloseAllPositions(update: Update):
 
         # Cierra todas las posiciones abiertas
         for position in positions:
-            await connection.close_position(position['positionId'])
+            await connection.close_position(position['id'])
 
         update.effective_message.reply_text("Todas las posiciones se han cerrado con éxito.")
 
@@ -421,7 +422,6 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
         except Exception as error:
             message_text = update.effective_message.text.lower()
             if "running" in message_text or "tp" in message_text:
-                    update.effective_message.reply_text("All open positions have been closed.")
                     asyncio.run(CloseAllPositions(update))
             logger.error(f'Error: {error}')
             errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
