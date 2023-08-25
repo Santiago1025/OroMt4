@@ -337,7 +337,12 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             
             # checks if there was an issue with parsing the trade
             if(not(trade)):
-                raise Exception('Invalid Trade')
+
+                message_text = update.effective_message.text.lower()
+                if "running" in message_text or "tp" in message_text:
+                    update.effective_message.reply_text("All open positions have been closed.")
+                else:
+                    raise Exception('Invalid Trade')
 
             # sets the user context trade equal to the parsed trade
             context.user_data['trade'] = trade
