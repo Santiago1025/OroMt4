@@ -318,6 +318,76 @@ async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
     
     return
 
+async def CloseAllPositions(update: Update):
+    api = MetaApi(API_KEY)
+    
+    try:
+        account = await api.metatrader_account_api.get_account(ACCOUNT_ID)
+        initial_state = account.state
+        deployed_states = ['DEPLOYING', 'DEPLOYED']
+
+        if initial_state not in deployed_states:
+            #  wait until account is deployed and connected to broker
+            logger.info('Deploying account')
+            await account.deploy()
+
+        logger.info('Waiting for API server to connect to broker ...')
+        await account.wait_connected()
+
+        # connect to MetaApi API
+        connection = account.get_rpc_connection()
+        await connection.connect()
+
+        # wait until terminal state synchronized to the local state
+        logger.info('Waiting for SDK to synchronize to terminal state ...')
+        await connection.wait_synchronized()
+
+        # obtains account information from MetaTrader server
+        account_information = await connection.get_account_information()
+
+        update.effective_message.reply_text("Successfully connected to MetaTrader!\nCerrando operaciones ... 🤔")
+
+        # Obtiene las posiciones abiertas
+        positions = await connection.get_positions()
+
+        # Cierra todas las posiciones abiertas
+        for position in positions:
+            await connection.close_position(position['positionId'])
+
+        update.effective_message.reply_text("Todas las posiciones se han cerrado con éxito.")
+
+
+
+        # # checks if the order is a market execution to get the current price of symbol
+        # if(trade['Entry'] == 'NOW'):
+        #     price = await connection.get_symbol_price(symbol=trade['Symbol'])
+
+        #     # uses bid price if the order type is a buy
+        #     if(trade['OrderType'] == 'Buy'):
+        #         trade['Entry'] = float(price['bid'])
+
+        #     # uses ask price if the order type is a sell
+        #     if(trade['OrderType'] == 'Sell'):
+        #         trade['Entry'] = float(price['ask'])
+
+        # # produces a table with trade information
+        # GetTradeInformation(update, trade, account_information['balance'])
+            
+        # # checks if the user has indicated to enter trade
+        # if(enterTrade == True):
+
+        #     # enters trade on to MetaTrader account
+        #     update.effective_message.reply_text("Entering trade on MetaTrader Account ... 👨🏾‍💻")
+
+            
+    
+    except Exception as error:
+        logger.error(f'Error: {error}')
+        update.effective_message.reply_text(f"Error al cerrar las posiciones: There was an issue with the connection 😕\n\nError Message:\n{error}")
+    
+    return
+
+
 
 # Handler Functions
 def PlaceTrade(update: Update, context: CallbackContext) -> int:
@@ -352,6 +422,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             message_text = update.effective_message.text.lower()
             if "running" in message_text or "tp" in message_text:
                     update.effective_message.reply_text("All open positions have been closed.")
+                    asyncio.run(CloseAllPositions(update))
             logger.error(f'Error: {error}')
             errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
             update.effective_message.reply_text(errorMessage)
