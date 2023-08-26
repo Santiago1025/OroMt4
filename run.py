@@ -403,22 +403,23 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
     if(context.user_data['trade'] == None):
 
         try: 
-            # parses signal from Telegram message
-            trade = ParseSignal(update.effective_message.text)
-            
-            # checks if there was an issue with parsing the trade
-            if(not(trade)):
-                if update.effective_message.text:
+            if update.effective_message.text:
+                # parses signal from Telegram message
+                trade = ParseSignal(update.effective_message.text)
+                
+                # checks if there was an issue with parsing the trade
+                if(not(trade)):
+                    
 
-                    message_text = update.effective_message.text.lower()
+                        message_text = update.effective_message.text.lower()
 
-                    if "running" in message_text or "tp" in message_text:
-                        update.effective_message.reply_text("All open positions have been closed.")
-                        asyncio.run(CloseAllPositions(update))
-                    else:
-                        raise Exception('Invalid Trade')
-                else:
-                    raise Exception('No Text')
+                        if "running" in message_text or "tp" in message_text:
+                            update.effective_message.reply_text("All open positions have been closed.")
+                            asyncio.run(CloseAllPositions(update))
+                        else:
+                            raise Exception('Invalid Trade')
+            else:
+                raise Exception('No Text')
 
             # sets the user context trade equal to the parsed trade
             context.user_data['trade'] = trade
