@@ -408,13 +408,17 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             
             # checks if there was an issue with parsing the trade
             if(not(trade)):
+                if update.effective_message.text:
 
-                message_text = update.effective_message.text.lower()
-                if "running" in message_text or "tp" in message_text:
-                    update.effective_message.reply_text("All open positions have been closed.")
-                    asyncio.run(CloseAllPositions(update))
+                    message_text = update.effective_message.text.lower()
+
+                    if "running" in message_text or "tp" in message_text:
+                        update.effective_message.reply_text("All open positions have been closed.")
+                        asyncio.run(CloseAllPositions(update))
+                    else:
+                        raise Exception('Invalid Trade')
                 else:
-                    raise Exception('Invalid Trade')
+                    raise Exception('No Text')
 
             # sets the user context trade equal to the parsed trade
             context.user_data['trade'] = trade
