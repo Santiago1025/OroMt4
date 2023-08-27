@@ -405,6 +405,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
         try: 
             if update.message.photo:
                 # Handle the image if needed
+                update.effective_message.reply_text("Habéis detectado vuestra imagen🥳⏰")
                 pass
             else:
                 if update.effective_message.text:
@@ -430,12 +431,17 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             update.effective_message.reply_text("Trade Successfully Parsed! 🥳\nConnecting to MetaTrader ... \n(May take a while) ⏰")
         
         except Exception as error:
-            message_text = update.effective_message.text.lower()
-            if "running" in message_text or "tp" in message_text:
-                    asyncio.run(CloseAllPositions(update))
-            logger.error(f'Error: {error}')
-            errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
-            update.effective_message.reply_text(errorMessage)
+            if update.message.photo:
+                update.effective_message.reply_text("Habéis detectado vuestra imagen🥳⏰")
+                pass
+            else:
+                if update.effective_message.text:
+                    message_text = update.effective_message.text.lower()
+                    if "running" in message_text or "tp" in message_text:
+                            asyncio.run(CloseAllPositions(update))
+                    logger.error(f'Error: {error}')
+                    errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
+                    update.effective_message.reply_text(errorMessage)
 
             # returns to TRADE state to reattempt trade parsing
             return TRADE
