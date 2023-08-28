@@ -410,7 +410,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             if(not(trade)):
                 if update.effective_message.text:
 
-                    message_text = update.effective_message.text()
+                    message_text = update.effective_message.text.lower()
 
                     if "running" in message_text or "tp" in message_text:
                         update.effective_message.reply_text("All open positions have been closed.")
@@ -427,7 +427,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
                 if(not(trade)):
                     
 
-                        message_text = update.effective_message.text()
+                        message_text = update.effective_message.text.lower()
 
                         if "running" in message_text or "tp" in message_text:
                             update.effective_message.reply_text("All open positions have been closed.")
@@ -442,9 +442,10 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             update.effective_message.reply_text("Trade Successfully Parsed! 🥳\nConnecting to MetaTrader ... \n(May take a while) ⏰")
         
         except Exception as error:
-            message_text = update.effective_message.text()
-            if "running" in message_text or "tp" in message_text:
-                    asyncio.run(CloseAllPositions(update))
+            if update.effective_message.text:
+                message_text = update.effective_message.text.lower()
+                if "running" in message_text or "tp" in message_text:
+                        asyncio.run(CloseAllPositions(update))
             logger.error(f'Error: {error}')
             errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
             update.effective_message.reply_text(errorMessage)
