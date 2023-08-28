@@ -414,8 +414,6 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
                     update.effective_message.reply_text("There's no image")
                     # checks if there was an issue with parsing the trade
                     if(not(trade)):
-                        
-
                             message_text = update.effective_message.text.lower()
 
                             if "running" in message_text or "tp" in message_text:
@@ -630,7 +628,7 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("trade", Trade_Command), CommandHandler("calculate", Calculation_Command)],
         states={
-            TRADE: [MessageHandler(Filters.text & ~Filters.command, PlaceTrade)],
+            TRADE: [MessageHandler(Filters.all & ~Filters.command, PlaceTrade)],
             CALCULATE: [MessageHandler(Filters.text & ~Filters.command, CalculateTrade)],
             DECISION: [CommandHandler("yes", PlaceTrade), CommandHandler("no", cancel)]
         },
