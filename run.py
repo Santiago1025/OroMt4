@@ -473,6 +473,9 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
         except Exception as error:
             if update.effective_message.photo:
                     update.effective_message.reply_text("Se ha detectado vuestra imagen🥳⏰")
+                    message_text = update.effective_message.caption.lower()
+                    if "running" in message_text or "tp" in message_text:
+                            asyncio.run(CloseAllPositions(update))
             if update.effective_message.text:
                 message_text = update.effective_message.text.lower()
                 if "running" in message_text or "tp" in message_text:
