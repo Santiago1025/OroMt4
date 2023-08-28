@@ -408,6 +408,15 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             
             # checks if there was an issue with parsing the trade
             if(not(trade)):
+                
+                if update.effective_message.photo:
+                    update.effective_message.reply_text("Se ha detectado vuestra imagen🥳⏰")
+                    # Remove the image part from the update.effective_message
+                    message_text = update.effective_message.caption.lower() if update.effective_message.caption else ""
+                else:
+                    message_text = update.effective_message.text.lower()
+                    
+
                 if update.effective_message.text:
 
                     message_text = update.effective_message.text.lower()
