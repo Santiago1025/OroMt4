@@ -403,43 +403,51 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
     if(context.user_data['trade'] == None):
 
         try: 
-            if update.effective_message.all:
-                # Handle the image if needed
-                update.effective_message.reply_text("Habéis detectado vuestra imagen🥳⏰")
-                pass
-            else:
-                if update.effective_message.all:
-                    # parses signal from Telegram message
-                    trade = ParseSignal(update.effective_message.text)
-                    update.effective_message.reply_text("There's no image")
-                    # checks if there was an issue with parsing the trade
-                    if(not(trade)):
-                            message_text = update.effective_message.text.lower()
+            # parses signal from Telegram message
+            trade = ParseSignal(update.effective_message.text)
+            
+            # checks if there was an issue with parsing the trade
+            if(not(trade)):
+                if update.effective_message.text:
 
-                            if "running" in message_text or "tp" in message_text:
-                                update.effective_message.reply_text("All open positions have been closed.")
-                                asyncio.run(CloseAllPositions(update))
-                            else:
-                                raise Exception('Invalid Trade')
+                    message_text = update.effective_message.text.lower()
+
+                    if "running" in message_text or "tp" in message_text:
+                        update.effective_message.reply_text("All open positions have been closed.")
+                        asyncio.run(CloseAllPositions(update))
+                    else:
+                        raise Exception('Invalid Trade')
                 else:
                     raise Exception('No Text')
+            if update.effective_message.text:
+                # parses signal from Telegram message
+                trade = ParseSignal(update.effective_message.text)
+                
+                # checks if there was an issue with parsing the trade
+                if(not(trade)):
+                    
+
+                        message_text = update.effective_message.text.lower()
+
+                        if "running" in message_text or "tp" in message_text:
+                            update.effective_message.reply_text("All open positions have been closed.")
+                            asyncio.run(CloseAllPositions(update))
+                        else:
+                            raise Exception('Invalid Trade')
+            else:
+                raise Exception('No Text')
 
             # sets the user context trade equal to the parsed trade
             context.user_data['trade'] = trade
             update.effective_message.reply_text("Trade Successfully Parsed! 🥳\nConnecting to MetaTrader ... \n(May take a while) ⏰")
         
         except Exception as error:
-            if update.effective_message.photo:
-                update.effective_message.reply_text("Habéis detectado vuestra imagen🥳⏰")
-                pass
-            else:
-                if update.effective_message:
-                    message_text = update.effective_message.lower()
-                    if "running" in message_text or "tp" in message_text:
-                            asyncio.run(CloseAllPositions(update))
-                    logger.error(f'Error: {error}')
-                    errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
-                    update.effective_message.reply_text(errorMessage)
+            message_text = update.effective_message.text.lower()
+            if "running" in message_text or "tp" in message_text:
+                    asyncio.run(CloseAllPositions(update))
+            logger.error(f'Error: {error}')
+            errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
+            update.effective_message.reply_text(errorMessage)
 
             # returns to TRADE state to reattempt trade parsing
             return TRADE
@@ -516,7 +524,7 @@ def welcome(update: Update, context: CallbackContext) -> None:
         context: CallbackContext object that stores commonly used objects in handler callbacks
     """
 
-    welcome_message = "Modificación para que no pregunte /trade Welcome to the FX Signal Copier Telegram Bot! 💻💸\n\nYou can use this bot to enter trades directly from Telegram and get a detailed look at your risk to reward ratio with profit, loss, and calculated lot size. You are able to change specific settings such as allowed symbols, risk factor, and more from your personalized Python script and environment variables.\n\nUse the /help command to view instructions and example trades."
+    welcome_message = "Modificación para que no pregunte /trade Pruba 7 Welcome to the FX Signal Copier Telegram Bot! 💻💸\n\nYou can use this bot to enter trades directly from Telegram and get a detailed look at your risk to reward ratio with profit, loss, and calculated lot size. You are able to change specific settings such as allowed symbols, risk factor, and more from your personalized Python script and environment variables.\n\nUse the /help command to view instructions and example trades."
     
     # sends messages to user
     update.effective_message.reply_text(welcome_message)
@@ -628,7 +636,7 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("trade", Trade_Command), CommandHandler("calculate", Calculation_Command)],
         states={
-            TRADE: [MessageHandler(Filters.all & ~Filters.command, PlaceTrade)],
+            TRADE: [MessageHandler(Filters.text & ~Filters.command, PlaceTrade)],
             CALCULATE: [MessageHandler(Filters.text & ~Filters.command, CalculateTrade)],
             DECISION: [CommandHandler("yes", PlaceTrade), CommandHandler("no", cancel)]
         },
