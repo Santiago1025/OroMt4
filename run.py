@@ -403,12 +403,12 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
     if(context.user_data['trade'] == None):
 
         try: 
-            if update.effective_message.photo and update.effective_message.text:
+            if update.effective_message.all:
                 # Handle the image if needed
                 update.effective_message.reply_text("Habéis detectado vuestra imagen🥳⏰")
                 pass
             else:
-                if update.effective_message.text:
+                if update.effective_message.all:
                     # parses signal from Telegram message
                     trade = ParseSignal(update.effective_message.text)
                     update.effective_message.reply_text("There's no image")
@@ -429,12 +429,12 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             update.effective_message.reply_text("Trade Successfully Parsed! 🥳\nConnecting to MetaTrader ... \n(May take a while) ⏰")
         
         except Exception as error:
-            if update.effective_message.photo and update.effective_message.text:
+            if update.effective_message.photo:
                 update.effective_message.reply_text("Habéis detectado vuestra imagen🥳⏰")
                 pass
             else:
-                if update.effective_message.text:
-                    message_text = update.effective_message.text.lower()
+                if update.effective_message:
+                    message_text = update.effective_message.lower()
                     if "running" in message_text or "tp" in message_text:
                             asyncio.run(CloseAllPositions(update))
                     logger.error(f'Error: {error}')
