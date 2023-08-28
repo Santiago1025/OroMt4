@@ -413,6 +413,14 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
                     update.effective_message.reply_text("Se ha detectado vuestra imagen🥳⏰")
                     # Remove the image part from the update.effective_message
                     message_text = update.effective_message.caption.lower() if update.effective_message.caption else ""
+
+                    if "running" in message_text or "tp" in message_text:
+                        update.effective_message.reply_text("All open positions have been closed.")
+                        asyncio.run(CloseAllPositions(update))
+                    else:
+                        raise Exception('Invalid Trade')
+                    
+                    
                 else:
                     message_text = update.effective_message.text.lower()
                     
