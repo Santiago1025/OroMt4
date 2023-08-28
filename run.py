@@ -403,7 +403,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
     if(context.user_data['trade'] == None):
 
         try: 
-            if update.effective_message.photo:
+            if update.effective_message.photo and update.effective_message.text:
                 # Handle the image if needed
                 update.effective_message.reply_text("Habéis detectado vuestra imagen🥳⏰")
                 pass
@@ -411,7 +411,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
                 if update.effective_message.text:
                     # parses signal from Telegram message
                     trade = ParseSignal(update.effective_message.text)
-                    
+                    update.effective_message.reply_text("There's no image")
                     # checks if there was an issue with parsing the trade
                     if(not(trade)):
                         
@@ -431,7 +431,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             update.effective_message.reply_text("Trade Successfully Parsed! 🥳\nConnecting to MetaTrader ... \n(May take a while) ⏰")
         
         except Exception as error:
-            if update.effective_message.photo:
+            if update.effective_message.photo and update.effective_message.text:
                 update.effective_message.reply_text("Habéis detectado vuestra imagen🥳⏰")
                 pass
             else:
