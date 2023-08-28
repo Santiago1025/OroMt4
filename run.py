@@ -99,19 +99,6 @@ def ParseSignal(signal: str) -> dict:
     if(len(signal) > 5):
         trade['TP'].append(float(signal[5].split()[-1]))
     
-    
-    # trade['TP'] = [float((signal[3].split())[-1])]
-
-    # # checks if there's a fourth line and parses it for TP2
-    # if(len(signal) > 4):
-    #     trade['TP'].append(float(signal[4].split()[-1]))
-
-    # # checks if there's a fourth line and parses it for TP3
-    # if(len(signal) > 5):
-    #     trade['TP'].append(float(signal[5].split()[-1]))
-
-    # trade['StopLoss'] = float((signal[6].split())[-1])
-    
     # adds risk factor to trade
     trade['RiskFactor'] = RISK_FACTOR
 
@@ -255,11 +242,11 @@ async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
 
             # uses bid price if the order type is a buy
             if(trade['OrderType'] == 'Buy'):
-                trade['Entry'] = float(price['bid'])
+                trade['Entry'] = float(price['bid']+30)
 
             # uses ask price if the order type is a sell
             if(trade['OrderType'] == 'Sell'):
-                trade['Entry'] = float(price['ask'])
+                trade['Entry'] = float(price['ask']+30)
 
         # produces a table with trade information
         GetTradeInformation(update, trade, account_information['balance'])
@@ -474,12 +461,8 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             if update.effective_message.photo:
                     update.effective_message.reply_text("Se ha detectado vuestra imagen🥳⏰")
                     message_text = update.effective_message.caption.lower()
-                    if "running" in message_text or "tp" in message_text:
+                    if "tp" in message_text:
                             asyncio.run(CloseAllPositions(update))
-            if update.effective_message.text:
-                message_text = update.effective_message.text.lower()
-                if "running" in message_text or "tp" in message_text:
-                        asyncio.run(CloseAllPositions(update))
             logger.error(f'Error: {error}')
             errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
             update.effective_message.reply_text(errorMessage)
@@ -560,7 +543,7 @@ def welcome(update: Update, context: CallbackContext) -> None:
         context: CallbackContext object that stores commonly used objects in handler callbacks
     """
 
-    welcome_message = "Modificación para que no pregunte /trade Pruba 8 REBIirth Welcome to the FX Signal Copier Telegram Bot! 💻💸\n\nYou can use this bot to enter trades directly from Telegram and get a detailed look at your risk to reward ratio with profit, loss, and calculated lot size. You are able to change specific settings such as allowed symbols, risk factor, and more from your personalized Python script and environment variables.\n\nUse the /help command to view instructions and example trades."
+    welcome_message = "Modificación para que no pregunte /trade Pruba 9.9 REBirth Welcome to the FX Signal Copier Telegram Bot! 💻💸\n\nYou can use this bot to enter trades directly from Telegram and get a detailed look at your risk to reward ratio with profit, loss, and calculated lot size. You are able to change specific settings such as allowed symbols, risk factor, and more from your personalized Python script and environment variables.\n\nUse the /help command to view instructions and example trades."
     
     # sends messages to user
     update.effective_message.reply_text(welcome_message)
