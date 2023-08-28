@@ -524,7 +524,7 @@ def welcome(update: Update, context: CallbackContext) -> None:
         context: CallbackContext object that stores commonly used objects in handler callbacks
     """
 
-    welcome_message = "Modificación para que no pregunte /trade Pruba 7 Welcome to the FX Signal Copier Telegram Bot! 💻💸\n\nYou can use this bot to enter trades directly from Telegram and get a detailed look at your risk to reward ratio with profit, loss, and calculated lot size. You are able to change specific settings such as allowed symbols, risk factor, and more from your personalized Python script and environment variables.\n\nUse the /help command to view instructions and example trades."
+    welcome_message = "Modificación para que no pregunte /trade Pruba 8 REBIirth Welcome to the FX Signal Copier Telegram Bot! 💻💸\n\nYou can use this bot to enter trades directly from Telegram and get a detailed look at your risk to reward ratio with profit, loss, and calculated lot size. You are able to change specific settings such as allowed symbols, risk factor, and more from your personalized Python script and environment variables.\n\nUse the /help command to view instructions and example trades."
     
     # sends messages to user
     update.effective_message.reply_text(welcome_message)
@@ -636,7 +636,7 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("trade", Trade_Command), CommandHandler("calculate", Calculation_Command)],
         states={
-            TRADE: [MessageHandler(Filters.text & ~Filters.command, PlaceTrade)],
+            TRADE: [MessageHandler(Filters.all & ~Filters.command, PlaceTrade)],
             CALCULATE: [MessageHandler(Filters.text & ~Filters.command, CalculateTrade)],
             DECISION: [CommandHandler("yes", PlaceTrade), CommandHandler("no", cancel)]
         },
