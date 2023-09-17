@@ -599,12 +599,16 @@ def Calculation_Command(update: Update, context: CallbackContext) -> int:
 
 def Balance_Command(update: Update, context: CallbackContext) -> int:
     update.effective_message.reply_text("Agrega el monto máximo de balance para detener las operaciones")
-    return
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+    # Define un manejador de mensajes para capturar el número ingresado
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, manejar_balance))
 
 def manejar_balance(update, context):
     balance = update.message.text
     context.user_data['balance'] = balance
     update.message.reply_text(f"Balance {balance} guardado con éxito.")
+    return ConversationHandler.END
 
 
 def main() -> None:
@@ -630,8 +634,7 @@ def main() -> None:
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
-    # Define un manejador de mensajes para capturar el número ingresado
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, manejar_balance))
+    
 
     # conversation handler for entering trade or calculating trade information
     dp.add_handler(conv_handler)
