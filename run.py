@@ -199,7 +199,7 @@ def CreateTable(trade: dict, balance: float, stopLossPips: int, takeProfitPips: 
 
     return table
 
-async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
+async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool, context):
     """Attempts connection to MetaAPI and MetaTrader to place trade.
 
     Arguments:
@@ -256,7 +256,7 @@ async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
             
         # checks if the user has indicated to enter trade
         balanceActual = account_information['balance']
-        if balanceActual < balanceMaximo:
+        if balanceActual < context.user_data['balance']:
             if(enterTrade == True):
 
                 # enters trade on to MetaTrader account
@@ -597,20 +597,14 @@ def Calculation_Command(update: Update, context: CallbackContext) -> int:
 
     return CALCULATE
 
-def Balance_Command(update: Update, context: CallbackContext) -> None:
+def Balance_Command(update: Update, context: CallbackContext) -> int:
     update.effective_message.reply_text("Agrega el monto máximo de balance para detener las operaciones")
-    return balanceMaximo
+    return
 
 def manejar_balance(update, context):
-    try:
-        balance = float(update.message.text)  # Intenta convertir el texto en un número
-        context.user_data['balance'] = balance  # Guarda el número en user_data
-        balance = balanceMaximo
-        update.message.reply_text(f"Balance {balance} guardado con éxito.")
-        return
-    except ValueError:
-        update.message.reply_text("Eso no parece ser un balance válido. Por favor, ingresa un número.")
-        return
+    balance = update.message.text
+    context.user_data['balance'] = balance
+    update.message.reply_text(f"Balance {balance} guardado con éxito.")
 
 
 def main() -> None:
