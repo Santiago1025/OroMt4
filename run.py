@@ -597,26 +597,20 @@ def Calculation_Command(update: Update, context: CallbackContext) -> int:
 
     return CALCULATE
 
-def handle_text_message(update, context): 
-    user_message = update.message.text
-    update.message.reply_text(f"Recibido: {user_message}")
-    return user_message
-
 def Balance_Command(update: Update, context: CallbackContext) -> None:
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
-    
-    global balanceMaximo 
-    context.user_data['balance'] = None
-    if(context.user_data['balance'] != None):
-        update.effective_message.reply_text("Agrega el monto máximo de balance para detener las operaciones")
-        dp.add_handler(MessageHandler(handle_text_message))
+    update.effective_message.reply_text("Agrega el monto máximo de balance para detener las operaciones")
+    return balanceMaximo
 
-    if(context.user_data['balance'] == None):
-        balanceMaximo = update.effective_message.text
-        update.effective_message.reply_text("Tu nuevo balance máximo es: "+balanceMaximo)
-        
-    return
+def manejar_balance(update, context):
+    try:
+        balance = float(update.message.text)  # Intenta convertir el texto en un número
+        context.user_data['balance'] = balance  # Guarda el número en user_data
+        balance = balanceMaximo
+        update.message.reply_text(f"Balance {balance} guardado con éxito.")
+        return
+    except ValueError:
+        update.message.reply_text("Eso no parece ser un balance válido. Por favor, ingresa un número.")
+        return
 
 
 def main() -> None:
@@ -642,6 +636,8 @@ def main() -> None:
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
+    # Define un manejador de mensajes para capturar el número ingresado
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, manejar_balance))
 
     # conversation handler for entering trade or calculating trade information
     dp.add_handler(conv_handler)
