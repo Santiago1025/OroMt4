@@ -9,8 +9,6 @@ from prettytable import PrettyTable
 from telegram import ParseMode, Update
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater, ConversationHandler, CallbackContext
 
-balanceMaximo = 1000
-
 # MetaAPI Credentials
 API_KEY = os.environ.get("API_KEY")
 ACCOUNT_ID = os.environ.get("ACCOUNT_ID")
@@ -31,7 +29,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # possibles states for conversation handler
-CALCULATE, TRADE, DECISION, MAXBALANCE = range(4)
+CALCULATE, TRADE, DECISION = range(3)
 
 # allowed FX symbols
 SYMBOLS = ['AUDCAD', 'AUDCHF', 'AUDJPY', 'AUDNZD', 'AUDUSD', 'CADCHF', 'CADJPY', 'CHFJPY', 'EURAUD', 'EURCAD', 'EURCHF', 'EURGBP', 'EURJPY', 'EURNZD', 'EURUSD', 'GBPAUD', 'GBPCAD', 'GBPCHF', 'GBPJPY', 'GBPNZD', 'GBPUSD', 'NOW', 'NZDCAD', 'NZDCHF', 'NZDJPY', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'XAGUSD', 'XAUUSD']
@@ -199,7 +197,7 @@ def CreateTable(trade: dict, balance: float, stopLossPips: int, takeProfitPips: 
 
     return table
 
-async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool, context):
+async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
     """Attempts connection to MetaAPI and MetaTrader to place trade.
 
     Arguments:
@@ -255,54 +253,52 @@ async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool, conte
         GetTradeInformation(update, trade, account_information['balance'])
             
         # checks if the user has indicated to enter trade
-        balanceActual = account_information['balance']
-        if balanceActual < context.user_data['balance']:
-            if(enterTrade == True):
+        if(enterTrade == True):
 
-                # enters trade on to MetaTrader account
-                update.effective_message.reply_text("Entering trade on MetaTrader Account ... 👨🏾‍💻")
+            # enters trade on to MetaTrader account
+            update.effective_message.reply_text("Entering trade on MetaTrader Account ... 👨🏾‍💻")
 
-                try:
-                    # executes buy market execution order
-                    if(trade['OrderType'] == 'Buy'):
-                        for takeProfit in trade['TP']:
-                            result = await connection.create_market_buy_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['StopLoss'], takeProfit)
+            try:
+                # executes buy market execution order
+                if(trade['OrderType'] == 'Buy'):
+                    for takeProfit in trade['TP']:
+                        result = await connection.create_market_buy_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['StopLoss'], takeProfit)
 
-                    # executes buy limit order
-                    elif(trade['OrderType'] == 'Buy Limit'):
-                        for takeProfit in trade['TP']:
-                            result = await connection.create_limit_buy_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['Entry'], trade['StopLoss'], takeProfit)
+                # executes buy limit order
+                elif(trade['OrderType'] == 'Buy Limit'):
+                    for takeProfit in trade['TP']:
+                        result = await connection.create_limit_buy_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['Entry'], trade['StopLoss'], takeProfit)
 
-                    # executes buy stop order
-                    elif(trade['OrderType'] == 'Buy Stop'):
-                        for takeProfit in trade['TP']:
-                            result = await connection.create_stop_buy_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['Entry'], trade['StopLoss'], takeProfit)
+                # executes buy stop order
+                elif(trade['OrderType'] == 'Buy Stop'):
+                    for takeProfit in trade['TP']:
+                        result = await connection.create_stop_buy_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['Entry'], trade['StopLoss'], takeProfit)
 
-                    # executes sell market execution order
-                    elif(trade['OrderType'] == 'Sell'):
-                        for takeProfit in trade['TP']:
-                            result = await connection.create_market_sell_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['StopLoss'], takeProfit)
+                # executes sell market execution order
+                elif(trade['OrderType'] == 'Sell'):
+                    for takeProfit in trade['TP']:
+                        result = await connection.create_market_sell_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['StopLoss'], takeProfit)
 
-                    # executes sell limit order
-                    elif(trade['OrderType'] == 'Sell Limit'):
-                        for takeProfit in trade['TP']:
-                            result = await connection.create_limit_sell_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['Entry'], trade['StopLoss'], takeProfit)
+                # executes sell limit order
+                elif(trade['OrderType'] == 'Sell Limit'):
+                    for takeProfit in trade['TP']:
+                        result = await connection.create_limit_sell_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['Entry'], trade['StopLoss'], takeProfit)
 
-                    # executes sell stop order
-                    elif(trade['OrderType'] == 'Sell Stop'):
-                        for takeProfit in trade['TP']:
-                            result = await connection.create_stop_sell_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['Entry'], trade['StopLoss'], takeProfit)
-                    
-                    # sends success message to user
-                    update.effective_message.reply_text("Trade entered successfully! 💰")
-                    
-                    # prints success message to console
-                    logger.info('\nTrade entered successfully!')
-                    logger.info('Result Code: {}\n'.format(result['stringCode']))
+                # executes sell stop order
+                elif(trade['OrderType'] == 'Sell Stop'):
+                    for takeProfit in trade['TP']:
+                        result = await connection.create_stop_sell_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['Entry'], trade['StopLoss'], takeProfit)
                 
-                except Exception as error:
-                    logger.info(f"\nTrade failed with error: {error}\n")
-                    update.effective_message.reply_text(f"There was an issue 😕\n\nError Message:\n{error}")
+                # sends success message to user
+                update.effective_message.reply_text("Trade entered successfully! 💰")
+                
+                # prints success message to console
+                logger.info('\nTrade entered successfully!')
+                logger.info('Result Code: {}\n'.format(result['stringCode']))
+            
+            except Exception as error:
+                logger.info(f"\nTrade failed with error: {error}\n")
+                update.effective_message.reply_text(f"There was an issue 😕\n\nError Message:\n{error}")
     
     except Exception as error:
         logger.error(f'Error: {error}')
@@ -348,6 +344,30 @@ async def CloseAllPositions(update: Update):
             await connection.close_position(position['id'])
 
         update.effective_message.reply_text("Todas las posiciones se han cerrado con éxito.")
+
+
+
+        # # checks if the order is a market execution to get the current price of symbol
+        # if(trade['Entry'] == 'NOW'):
+        #     price = await connection.get_symbol_price(symbol=trade['Symbol'])
+
+        #     # uses bid price if the order type is a buy
+        #     if(trade['OrderType'] == 'Buy'):
+        #         trade['Entry'] = float(price['bid'])
+
+        #     # uses ask price if the order type is a sell
+        #     if(trade['OrderType'] == 'Sell'):
+        #         trade['Entry'] = float(price['ask'])
+
+        # # produces a table with trade information
+        # GetTradeInformation(update, trade, account_information['balance'])
+            
+        # # checks if the user has indicated to enter trade
+        # if(enterTrade == True):
+
+        #     # enters trade on to MetaTrader account
+        #     update.effective_message.reply_text("Entering trade on MetaTrader Account ... 👨🏾‍💻")
+
             
     
     except Exception as error:
@@ -531,6 +551,27 @@ def welcome(update: Update, context: CallbackContext) -> None:
 
     return
 
+def help(update: Update, context: CallbackContext) -> None:
+    """Sends a help message when the command /help is issued
+
+    Arguments:
+        update: update from Telegram
+        context: CallbackContext object that stores commonly used objects in handler callbacks
+    """
+
+    help_message = "This bot is used to automatically enter trades onto your MetaTrader account directly from Telegram. To begin, ensure that you are authorized to use this bot by adjusting your Python script or environment variables.\n\nThis bot supports all trade order types (Market Execution, Limit, and Stop)\n\nAfter an extended period away from the bot, please be sure to re-enter the start command to restart the connection to your MetaTrader account."
+    commands = "List of COMANDOS:\n/start : displays welcome message\n/help : displays list of commands and example trades\n/trade : takes in user inputted trade for parsing and placement\n/calculate : calculates trade information for a user inputted trade"
+    trade_example = "Example Trades 💴:\n\n"
+    market_execution_example = "Market Execution:\nBUY GBPUSD\nEntry NOW\nSL 1.14336\nTP 1.28930\nTP 1.29845\n\n"
+    limit_example = "Limit Execution:\nBUY LIMIT GBPUSD\nEntry 1.14480\nSL 1.14336\nTP 1.28930\n\n"
+    note = "You are able to enter up to two take profits. If two are entered, both trades will use half of the position size, and one will use TP1 while the other uses TP2.\n\nNote: Use 'NOW' as the entry to enter a market execution trade."
+
+    # sends messages to user
+    update.effective_message.reply_text(help_message)
+    update.effective_message.reply_text(commands)
+    update.effective_message.reply_text(trade_example + market_execution_example + limit_example + note)
+
+    return
 
 def cancel(update: Update, context: CallbackContext) -> int:
     """Cancels and ends the conversation.   
@@ -597,19 +638,6 @@ def Calculation_Command(update: Update, context: CallbackContext) -> int:
 
     return CALCULATE
 
-def Balance_Command(update: Update, context: CallbackContext) -> int:
-    update.effective_message.reply_text("Agrega el monto máximo de balance para detener las operaciones")
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
-    # Define un manejador de mensajes para capturar el número ingresado
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, manejar_balance))
-
-def manejar_balance(update, context):
-    balance = update.message.text
-    context.user_data['balance'] = balance
-    update.message.reply_text(f"Balance {balance} guardado con éxito.")
-    return ConversationHandler.END
-
 
 def main() -> None:
     """Runs the Telegram bot."""
@@ -626,7 +654,7 @@ def main() -> None:
     dp.add_handler(CommandHandler("help", help))
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("trade", Trade_Command), CommandHandler("calculate", Calculation_Command), CommandHandler("balance",Balance_Command)],
+        entry_points=[CommandHandler("trade", Trade_Command), CommandHandler("calculate", Calculation_Command)],
         states={
             TRADE: [MessageHandler(Filters.all & ~Filters.command, PlaceTrade)],
             CALCULATE: [MessageHandler(Filters.text & ~Filters.command, CalculateTrade)],
@@ -634,7 +662,6 @@ def main() -> None:
         },
         fallbacks=[CommandHandler("cancel", cancel)],
     )
-    
 
     # conversation handler for entering trade or calculating trade information
     dp.add_handler(conv_handler)
