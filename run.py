@@ -306,44 +306,44 @@ async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
     
     return
 
-async def CloseAllPositions(update: Update):
-    update.effective_message.reply_text("All open positions have been closed.")
-    api = MetaApi(API_KEY)
+# async def CloseAllPositions(update: Update):
+#     update.effective_message.reply_text("All open positions have been closed.")
+#     api = MetaApi(API_KEY)
     
-    try:
-        account = await api.metatrader_account_api.get_account(ACCOUNT_ID)
-        initial_state = account.state
-        deployed_states = ['DEPLOYING', 'DEPLOYED']
+#     try:
+#         account = await api.metatrader_account_api.get_account(ACCOUNT_ID)
+#         initial_state = account.state
+#         deployed_states = ['DEPLOYING', 'DEPLOYED']
 
-        if initial_state not in deployed_states:
-            #  wait until account is deployed and connected to broker
-            logger.info('Deploying account')
-            await account.deploy()
+#         if initial_state not in deployed_states:
+#             #  wait until account is deployed and connected to broker
+#             logger.info('Deploying account')
+#             await account.deploy()
 
-        logger.info('Waiting for API server to connect to broker ...')
-        await account.wait_connected()
+#         logger.info('Waiting for API server to connect to broker ...')
+#         await account.wait_connected()
 
-        # connect to MetaApi API
-        connection = account.get_rpc_connection()
-        await connection.connect()
+#         # connect to MetaApi API
+#         connection = account.get_rpc_connection()
+#         await connection.connect()
 
-        # wait until terminal state synchronized to the local state
-        logger.info('Waiting for SDK to synchronize to terminal state ...')
-        await connection.wait_synchronized()
+#         # wait until terminal state synchronized to the local state
+#         logger.info('Waiting for SDK to synchronize to terminal state ...')
+#         await connection.wait_synchronized()
 
-        # obtains account information from MetaTrader server
-        account_information = await connection.get_account_information()
+#         # obtains account information from MetaTrader server
+#         account_information = await connection.get_account_information()
 
-        update.effective_message.reply_text("Successfully connected to MetaTrader!\nCerrando operaciones ... 🤔")
+#         update.effective_message.reply_text("Successfully connected to MetaTrader!\nCerrando operaciones ... 🤔")
 
-        # Obtiene las posiciones abiertas
-        positions = await connection.get_positions()
+#         # Obtiene las posiciones abiertas
+#         positions = await connection.get_positions()
 
-        # Cierra todas las posiciones abiertas
-        for position in positions:
-            await connection.close_position(position['id'])
+#         # Cierra todas las posiciones abiertas
+#         for position in positions:
+#             await connection.close_position(position['id'])
 
-        update.effective_message.reply_text("Todas las posiciones se han cerrado con éxito.")
+#         update.effective_message.reply_text("Todas las posiciones se han cerrado con éxito.")
 
 
 
@@ -370,11 +370,11 @@ async def CloseAllPositions(update: Update):
 
             
     
-    except Exception as error:
-        logger.error(f'Error: {error}')
-        update.effective_message.reply_text(f"Error al cerrar las posiciones: There was an issue with the connection 😕\n\nError Message:\n{error}")
+    # except Exception as error:
+    #     logger.error(f'Error: {error}')
+    #     update.effective_message.reply_text(f"Error al cerrar las posiciones: There was an issue with the connection 😕\n\nError Message:\n{error}")
     
-    return
+    # return
 
 
 
@@ -395,7 +395,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
             if "running" in message_text or "tp" in message_text:
                 update.effective_message.reply_text("All open positions have been closed.")
-                asyncio.run(CloseAllPositions(update))
+                # asyncio.run(CloseAllPositions(update))
             else:
                 raise Exception('Invalid Trade')
 
@@ -416,7 +416,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
                     if "running" in message_text or "tp" in message_text:
                         update.effective_message.reply_text("All open positions have been closed.")
-                        asyncio.run(CloseAllPositions(update))
+                        # asyncio.run(CloseAllPositions(update))
                     else:
                         raise Exception('Invalid Trade')
                     
@@ -431,7 +431,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
                     if "running" in message_text or "tp" in message_text:
                         update.effective_message.reply_text("All open positions have been closed.")
-                        asyncio.run(CloseAllPositions(update))
+                        # asyncio.run(CloseAllPositions(update))
                     else:
                         raise Exception('Invalid Trade')
                 else:
@@ -448,7 +448,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
                         if "running" in message_text or "tp" in message_text:
                             update.effective_message.reply_text("All open positions have been closed.")
-                            asyncio.run(CloseAllPositions(update))
+                            # asyncio.run(CloseAllPositions(update))
                         else:
                             raise Exception('Invalid Trade')
             else:
@@ -462,8 +462,8 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             if update.effective_message.photo:
                     update.effective_message.reply_text("Se ha detectado vuestra imagen🥳⏰")
                     message_text = update.effective_message.caption.lower()
-                    if "tp" in message_text:
-                            asyncio.run(CloseAllPositions(update))
+                    # if "tp" in message_text:
+                    #         asyncio.run(CloseAllPositions(update))
             logger.error(f'Error: {error}')
             errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
             update.effective_message.reply_text(errorMessage)
