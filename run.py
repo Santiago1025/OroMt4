@@ -93,7 +93,7 @@ def ParseSignal(signal: str) -> dict:
         trade['Entry'] = 'NOW'
 
     trade['StopLoss'] = float((signal[2].split())[-1])
-    trade['TP'] = 0
+    trade['TP'] = [float((signal[5].split())[-1])]
 
     # # checks if there's a fourth line and parses it for TP2
     # if(len(signal) > 5):
@@ -395,7 +395,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
             if "running" in message_text or "tp" in message_text:
                 update.effective_message.reply_text("All open positions have been closed.")
-                # asyncio.run(CloseAllPositions(update))
+                asyncio.run(CloseAllPositions(update))
             else:
                 raise Exception('Invalid Trade')
 
@@ -416,7 +416,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
                     if "running" in message_text or "tp" in message_text:
                         update.effective_message.reply_text("All open positions have been closed.")
-                        # asyncio.run(CloseAllPositions(update))
+                        asyncio.run(CloseAllPositions(update))
                     else:
                         raise Exception('Invalid Trade')
                     
@@ -431,7 +431,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
                     if "running" in message_text or "tp" in message_text:
                         update.effective_message.reply_text("All open positions have been closed.")
-                        # asyncio.run(CloseAllPositions(update))
+                        asyncio.run(CloseAllPositions(update))
                     else:
                         raise Exception('Invalid Trade')
                 else:
@@ -448,7 +448,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
                         if "running" in message_text or "tp" in message_text:
                             update.effective_message.reply_text("All open positions have been closed.")
-                            # asyncio.run(CloseAllPositions(update))
+                            asyncio.run(CloseAllPositions(update))
                         else:
                             raise Exception('Invalid Trade')
             else:
@@ -462,8 +462,8 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             if update.effective_message.photo:
                     update.effective_message.reply_text("Se ha detectado vuestra imagen🥳⏰")
                     message_text = update.effective_message.caption.lower()
-                    # if "tp" in message_text:
-                    #         asyncio.run(CloseAllPositions(update))
+                    if "tp" in message_text:
+                            asyncio.run(CloseAllPositions(update))
             logger.error(f'Error: {error}')
             errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
             update.effective_message.reply_text(errorMessage)
