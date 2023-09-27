@@ -93,7 +93,7 @@ def ParseSignal(signal: str) -> dict:
         trade['Entry'] = 'NOW'
 
     trade['StopLoss'] = float((signal[2].split())[-1])
-    trade['TP'] = [float((signal[5].split())[-1])]
+    trade['TP'] = 0
 
     # # checks if there's a fourth line and parses it for TP2
     # if(len(signal) > 5):
