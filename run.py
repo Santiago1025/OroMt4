@@ -93,7 +93,7 @@ def ParseSignal(signal: str) -> dict:
         trade['Entry'] = 'NOW'
 
     trade['StopLoss'] = float((signal[2].split())[-1])
-    trade['TP'] = 0.00
+    trade['TP'] = [float((signal[5].split())[-1])]
 
     # # checks if there's a fourth line and parses it for TP2
     # if(len(signal) > 5):
@@ -262,7 +262,7 @@ async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
                 # executes buy market execution order
                 if(trade['OrderType'] == 'Buy'):
                     for takeProfit in trade['TP']:
-                        result = await connection.create_market_buy_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['StopLoss'], takeProfit)
+                        result = await connection.create_market_buy_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['StopLoss'], 0.00)
 
                 # executes buy limit order
                 elif(trade['OrderType'] == 'Buy Limit'):
@@ -277,7 +277,7 @@ async def ConnectMetaTrader(update: Update, trade: dict, enterTrade: bool):
                 # executes sell market execution order
                 elif(trade['OrderType'] == 'Sell'):
                     for takeProfit in trade['TP']:
-                        result = await connection.create_market_sell_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['StopLoss'], takeProfit)
+                        result = await connection.create_market_sell_order(trade['Symbol'], trade['PositionSize'] / len(trade['TP']), trade['StopLoss'], 0.00)
 
                 # executes sell limit order
                 elif(trade['OrderType'] == 'Sell Limit'):
