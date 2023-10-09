@@ -87,10 +87,10 @@ def ParseSignal(signal: str) -> dict:
     
     # checks wheter or not to convert entry to float because of market exectution option ("NOW")
     if(trade['OrderType'] == 'Buy' or trade['OrderType'] == 'Sell'):
-        trade['Entry'] = (signal[1].split('@')[1]).strip()
+        trade['Entry'] = 'NOW'
     
     else:
-        trade['Entry'] = float((signal[1].split('@')[1]).strip())
+        trade['Entry'] = 'NOW'
 
     trade['StopLoss'] = float((signal[2].split())[-1])
     trade['TP'] = [float((signal[5].split())[-1])]
