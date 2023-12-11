@@ -393,7 +393,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             # Remove the image part from the update.effective_message
             message_text = update.effective_message.caption.lower() if update.effective_message.caption else ""
 
-            if "tp2" in message_text:
+            if "tp1" in message_text:
                 update.effective_message.reply_text("All open positions have been closed.")
                 asyncio.run(CloseAllPositions(update))
             else:
@@ -414,7 +414,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
                     # Remove the image part from the update.effective_message
                     message_text = update.effective_message.caption.lower() if update.effective_message.caption else ""
 
-                    if "tp2" in message_text:
+                    if "tp1" in message_text:
                         update.effective_message.reply_text("All open positions have been closed.")
                         asyncio.run(CloseAllPositions(update))
                     else:
@@ -429,7 +429,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
                     message_text = update.effective_message.text.lower()
 
-                    if "tp2" in message_text:
+                    if "tp1" in message_text:
                         update.effective_message.reply_text("All open positions have been closed.")
                         asyncio.run(CloseAllPositions(update))
                     else:
@@ -446,7 +446,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
 
                         message_text = update.effective_message.text.lower()
 
-                        if "tp2" in message_text:
+                        if "tp1" in message_text:
                             update.effective_message.reply_text("All open positions have been closed.")
                             asyncio.run(CloseAllPositions(update))
                         else:
@@ -462,7 +462,7 @@ def PlaceTrade(update: Update, context: CallbackContext) -> int:
             if update.effective_message.photo:
                     update.effective_message.reply_text("Se ha detectado vuestra imagen🥳⏰")
                     message_text = update.effective_message.caption.lower()
-                    if "tp2" in message_text:
+                    if "tp1" in message_text:
                             asyncio.run(CloseAllPositions(update))
             logger.error(f'Error: {error}')
             errorMessage = f"Hubo un error parcero 😕\n\nError: {error}\n\n /cancel"
